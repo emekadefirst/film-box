@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Film Wharf | Search</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</head>
+
+<body>
+    <style>
+        .card img {
+            max-width: 85px;
+            height: auto;
+        }
+    </style>
+    <div class="container">
+        <header class="mt-4">
+            <h1 class="text-center title text-success">Film Wharf</h1>
+            <p class="text-center">Get the latest movies here</p>
+        </header>
+
+        <section class="section-results">
+            <h3 class="search-title mb-4">Search results for "<span id="searchQuerySpan"></span>"</h3>
+            <div ></div>
+            
+        </section>
+        <div class="row">
+            <div class="col-md-8">
+                <div class="card mb-1" id="searchResultsContainer">
+                    <!-- Movie data will be displayed here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const searchQuery = new URLSearchParams(window.location.search).get('query');
+            const searchQuerySpan = document.getElementById('searchQuerySpan');
+            const searchResultsContainer = document.getElementById('searchResultsContainer');
+
+            if (searchQuery) {
+                searchQuerySpan.textContent = searchQuery;
+
+                fetch(`http://127.0.0.1:8000/search`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ query: searchQuery }),
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (Array.isArray(data)) {
+                            if (data.length > 0) {
+                                searchResultsContainer.innerHTML = '';
+                                data.forEach(movie => {
+                                    const card = `
+                                <div class="card-body d-flex">
+                                    <img src="${movie.thumbnail_url}" alt="Movie Thumbnail">
+                                    <div class="ps-1">
+                                        <h5 class="card-title">${movie.name}</h5>
+                                        <h6 class="card-title">Source ${movie.source}</h6>
+                                        <h6 class="card-title">Release Date: ${movie.release_date}</h6>
+                                        <a href="${movie.download_link}" class="btn btn-success">Download page</a>
+                                    </div>
+                                </div>
+                            `;
+                                    searchResultsContainer.innerHTML += card;
+                                });
+                            } else {
+                                searchResultsContainer.innerHTML = '<p>No results found.</p>';
+                            }
+                        } else {
+                            console.error("Invalid response format:", data);
+                        }
+                    })
+                    .catch(error => {
+                        console.error("Error fetching search results:", error);
+                    });
+            }
+        });
+    </script>
+</body>
+
+</html>
