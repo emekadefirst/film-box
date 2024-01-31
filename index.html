@@ -57,7 +57,7 @@
     <script>
         document.addEventListener("DOMContentLoaded", function () {
                 // Fetch data from the API
-                fetch("http://127.0.0.1:8000/api")
+                fetch("https://filmwharf.pythonanywhere.com/api")
                     .then(response => response.json())
                     .then(data => {
                         // Update the content of the movie cards
@@ -91,7 +91,7 @@
             const query = document.getElementById('searchQuery').value;
 
             // Make AJAX request to your search API endpoint
-            fetch(`http://127.0.0.1:8000/search`, {
+            fetch(`https://filmwharf.pythonanywhere.com/search`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
