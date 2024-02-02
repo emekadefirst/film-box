@@ -88,7 +88,7 @@
                 formDataObject['release_date'] = formattedDate;
 
                 // Send data to the Django REST API
-                fetch('http://127.0.0.1:8000/api', {
+                fetch('https://filmwharf.pythonanywhere.com/api', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
