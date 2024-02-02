@@ -57,13 +57,13 @@
         function postData() {
             const formData = new FormData(document.getElementById('jsonDataForm'));
 
-<<<<<<< HEAD
+
             const jsonData = {};
             formData.forEach((value, key) => {
                 jsonData[key] = value;
             });
 
-            const endpointUrl = 'http://127.0.0.1:8000/api';
+            const endpointUrl = 'https://filmwharf.pythonanywhere.com/api';
 
             fetch(endpointUrl, {
                 method: 'POST',
@@ -133,7 +133,6 @@
                     })
                     .then(data => {
                         console.log('Success:', data);
->>>>>>> ba3b08cadbcaa1ef5d08ab2a23785487fb4bec8d
 
                         // Create and insert success alert
                         const successAlert = document.createElement('div');
