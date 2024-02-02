@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JSON Data Form</title>
+</head>
+
+<body>
+
+    <form id="jsonDataForm">
+        
+
+       
+        <input type="text" id="name" name="name" required><br>
+
+        
+        <input type="text" id="genre" name="genre" required><br>
+
+        
+        <input type="text" id="download_link" name="download_link" required><br>
+
+        
+        <input type="text" id="source" name="source" required><br>
+
+        
+        <input type="date" id="release_date" name="release_date" required><br>
+
+        
+        <input type="text" id="thumbnail_url" name="thumbnail_url" required><br>
+
+        <button type="button" onclick="postData()">Send JSON Data</button>
+    </form>
+
+    <script>
+        function postData() {
+            const formData = new FormData(document.getElementById('jsonDataForm'));
+
+            const jsonData = {};
+            formData.forEach((value, key) => {
+                jsonData[key] = value;
+            });
+
+            const endpointUrl = 'https://filmwharf.pythonanywhere.com/api';
+
+            fetch(endpointUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(jsonData)
+            })
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Response:', data);
+                    // You can handle the response data as needed
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    // Handle errors here
+                });
+        }
+    </script>
+
+</body>
+
+</html>
