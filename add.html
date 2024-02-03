@@ -11,6 +11,8 @@
 
 <body>
     <style>
+        /* Your existing styles */
+
         .card img {
             max-width: 100%;
             height: auto;
@@ -25,137 +27,99 @@
                 </div>
             </div>
         </div>
-        <form id="jsonDataForm">
+        <form id="movieForm">
             <div class="mb-3">
                 <label class="form-label">Title</label>
-                <input type="text" class="form-control" id="name"  name="name">
+                <input type="text" class="form-control" name="name">
             </div>
             <div class="mb-3">
                 <label class="form-label">Genre</label>
-                <input type="text" class="form-control"id="genre" name="genre">
+                <input type="text" class="form-control" name="genre">
             </div>
             <div class="mb-3">
                 <label class="form-label">Release date</label>
-                <input type="date" class="form-control" name="release_date">
+                <input type="Date" class="form-control" name="release_date">
             </div>
             <div class="mb-3">
                 <label class="form-label">Link</label>
-                <input type="text" class="form-control" id="download_link" name="download_link">
+                <input type="text" class="form-control" name="download_link">
             </div>
             <div class="mb-3">
                 <label class="form-label">Image url</label>
-                <input type="text" class="form-control" id="thumbnail_url" name="thumbnail_url">
+                <input type="text" class="form-control" name="thumbnail_url">
             </div>
             <div class="mb-3">
                 <label class="form-label">Source</label>
-                <input type="text" class="form-control" id="source" name="source">
+                <input type="text" class="form-control" name="source">
             </div>
-            <button type="button" class="btn btn-primary" onclick="submitFormAndReload()">Submit</button>
+            <button type="submit" class="btn btn-primary">Submit</button>
         </form>
+
     </div>
-    <script>
-        function postData() {
-            const formData = new FormData(document.getElementById('jsonDataForm'));
 
+</body>
+<!-- ... Other HTML code ... -->
+<script>
+    document.getElementById('movieForm').addEventListener('submit', function (event) {
+        event.preventDefault();
 
-            const jsonData = {};
-            formData.forEach((value, key) => {
-                jsonData[key] = value;
-            });
+        // Collect form data
+        const formData = new FormData(event.target);
 
-            const endpointUrl = 'https://filmwharf.pythonanywhere.com/api';
+        // Convert form data to a plain object
+        const formDataObject = {};
+        formData.forEach((value, key) => {
+            formDataObject[key] = value;
+        });
 
-            fetch(endpointUrl, {
+        // Manually format the date to 'YYYY-MM-DD'
+        const releaseDateInput = formDataObject['release_date'];
+        const releaseDate = new Date(releaseDateInput);
+
+        // Check if the date is valid
+        if (!isNaN(releaseDate.getTime())) {
+            const formattedDate = releaseDate.toLocaleDateString('en-CA'); // 'en-CA' is the locale for 'YYYY-MM-DD' format
+            formDataObject['release_date'] = formattedDate;
+
+            // Send data to the Django REST API
+            fetch('https://filmwharf.pythonanywhere.com/api', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
                 },
-                body: JSON.stringify(jsonData)
+                body: JSON.stringify(formDataObject),
             })
-                .then(response => response.json())
+                .then(response => {
+                    if (response.ok) {
+                        return response.json();
+                    }
+                    throw new Error('Network response was not ok.');
+                })
                 .then(data => {
-                    console.log('Response:', data);
-                    // You can handle the response data as needed
+                    console.log('Success:', data);
+                    // Handle success (e.g., show a success message)
+
+                    // Create and insert success alert
+                    const successAlert = document.createElement('div');
+                    successAlert.className = 'alert alert-success mt-3';
+                    successAlert.setAttribute('role', 'alert');
+                    successAlert.innerText = 'You have successfully added a movie';
+
+                    const formContainer = document.querySelector('.container');
+                    formContainer.insertBefore(successAlert, document.getElementById('movieForm').nextSibling);
+
+                    // Refresh the page after successful POST
+                    window.location.reload();
                 })
                 .catch(error => {
                     console.error('Error:', error);
-                    // Handle errors here
+                    // Handle error (e.g., show an error message)
                 });
+        } else {
+            console.error('Invalid date format');
+            // Handle the error as needed (e.g., display an error message to the user)
         }
-    </script>
-</body>
-=======
-    <script>
-        function submitFormAndReload() {
-            // Your existing form submission code
-
-            // Refresh the page after a short delay (e.g., 1 second)
-            setTimeout(function () {
-                location.reload();
-            }, 1000);
-        }
-
-        document.getElementById('movieForm').addEventListener('submit', function (event) {
-            event.preventDefault();
-
-            // Collect form data
-            const formData = new FormData(event.target);
-
-            // Convert form data to a plain object
-            const formDataObject = {};
-            formData.forEach((value, key) => {
-                formDataObject[key] = value;
-            });
-
-            // Manually format the date to 'YYYY-MM-DD'
-            const releaseDateInput = formDataObject['release_date'];
-            const releaseDate = new Date(releaseDateInput);
-
-            // Check if the date is valid
-            if (!isNaN(releaseDate.getTime())) {
-                const formattedDate = releaseDate.toLocaleDateString('en-CA'); // 'en-CA' is the locale for 'YYYY-MM-DD' format
-                formDataObject['release_date'] = formattedDate;
-
-                // Send data to the Django REST API
-                fetch('https://filmwharf.pythonanywhere.com/api', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json',
-                    },
-                    body: JSON.stringify(formDataObject),
-                })
-                    .then(response => {
-                        if (response.ok) {
-                            return response.json();
-                        }
-                        throw new Error('Network response was not ok.');
-                    })
-                    .then(data => {
-                        console.log('Success:', data);
-
-                        // Create and insert success alert
-                        const successAlert = document.createElement('div');
-                        successAlert.className = 'alert alert-success mt-3';
-                        successAlert.setAttribute('role', 'alert');
-                        successAlert.innerText = 'You have successfully added a movie';
-
-                        const formContainer = document.querySelector('.container');
-                        formContainer.insertBefore(successAlert, document.getElementById('movieForm').nextSibling);
-
-                        // Call the function to submit the form and reload the page
-                        submitFormAndReload();
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        // Handle error (e.g., show an error message)
-                    });
-            } else {
-                console.error('Invalid date format');
-                // Handle the error as needed (e.g., display an error message to the user)
-            }
-        });
-    </script>
-</body>
-
+    });
+</script>
 </html>
